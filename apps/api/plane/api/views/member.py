@@ -76,11 +76,20 @@ class WorkspaceMemberAPIEndpoint(BaseAPIView):
 
         workspace_members = WorkspaceMember.objects.filter(workspace__slug=slug).select_related("member")
 
-        # Get all the users with their roles
+        requesting_user_membership = WorkspaceMember.objects.filter(
+            workspace__slug=slug, member=request.user, is_active=True
+        ).first()
+
+        is_admin = requesting_user_membership and requesting_user_membership.role == 20
+
         users_with_roles = []
         for workspace_member in workspace_members:
             user_data = UserLiteSerializer(workspace_member.member).data
             user_data["role"] = workspace_member.role
+
+            if not is_admin:
+                user_data["email"] = "No permission"
+
             users_with_roles.append(user_data)
 
         return Response(users_with_roles, status=status.HTTP_200_OK)

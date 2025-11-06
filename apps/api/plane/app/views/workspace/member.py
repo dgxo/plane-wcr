@@ -44,11 +44,22 @@ class WorkSpaceMemberViewSet(BaseViewSet):
 
         # Get all active workspace members
         workspace_members = self.get_queryset()
-        if workspace_member.role > 5:
+
+        is_admin = workspace_member.role == 20
+
+        if is_admin:
             serializer = WorkspaceMemberAdminSerializer(workspace_members, fields=("id", "member", "role"), many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             serializer = WorkSpaceMemberSerializer(workspace_members, fields=("id", "member", "role"), many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            response_data = serializer.data
+
+            # Hide emails for non-admin users
+            for member_data in response_data:
+                if "member" in member_data and "email" in member_data["member"]:
+                    member_data["member"]["email"] = "No permission"
+
+            return Response(response_data, status=status.HTTP_200_OK)
 
     @allow_permission(allowed_roles=[ROLE.ADMIN], level="WORKSPACE")
     def partial_update(self, request, slug, pk):
