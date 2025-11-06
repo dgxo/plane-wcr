@@ -86,6 +86,7 @@ export const ProfileSetupStep: FC<Props> = observer(({ handleStepChange }) => {
     const userDetailsPayload: Partial<IUser> = {
       first_name: formData.first_name,
       last_name: formData.last_name,
+      display_name: formData.first_name,
       avatar_url: formData.avatar_url ?? undefined,
     };
     try {
@@ -233,7 +234,7 @@ export const ProfileSetupStep: FC<Props> = observer(({ handleStepChange }) => {
                     "border-red-500": errors.first_name,
                   }
                 )}
-                placeholder="Enter your full name"
+                placeholder="Enter your display name"
                 autoComplete="on"
               />
             )}

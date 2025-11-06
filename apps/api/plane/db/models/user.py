@@ -152,11 +152,9 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.token_updated_at = timezone.now()
 
         if not self.display_name:
-            self.display_name = (
-                self.email.split("@")[0]
-                if len(self.email.split("@"))
-                else "".join(random.choice(string.ascii_letters) for _ in range(6))
-            )
+            # Generate a temporary user name
+            random_number = "".join(random.choice(string.digits) for _ in range(4))
+            self.display_name = f"User {random_number}"
 
         if self.is_superuser:
             self.is_staff = True
