@@ -136,7 +136,20 @@ class ProjectMemberAPIEndpoint(BaseAPIView):
             "member_id", flat=True
         )
 
+        # Check if the requesting user is an admin
+        requesting_user_membership = WorkspaceMember.objects.filter(
+            workspace__slug=slug, member=request.user, is_active=True
+        ).first()
+
+        is_admin = requesting_user_membership and requesting_user_membership.role == 20  # Admin role is 20
+
         # Get all the users that are present inside the workspace
         users = UserLiteSerializer(User.objects.filter(id__in=project_members), many=True).data
+
+        # Hide emails for non-admins
+        if not is_admin:
+            for user_data in users:
+                if "email" in user_data:
+                    user_data["email"] = "No permission"
 
         return Response(users, status=status.HTTP_200_OK)
