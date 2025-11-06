@@ -155,8 +155,11 @@ export const SendProjectInvitationModal: React.FC<Props> = observer((props) => {
               <Avatar name={memberDetails?.member.display_name} src={getFileURL(memberDetails?.member.avatar_url)} />
             </div>
             <div className="truncate">
-              {memberDetails?.member.display_name} (
-              {memberDetails?.member.first_name + " " + memberDetails?.member.last_name})
+              {(() => {
+                const fullName = memberDetails?.member.first_name + " " + memberDetails?.member.last_name;
+                const displayName = memberDetails?.member.display_name;
+                return displayName === fullName.trim() ? displayName : `${displayName} (${fullName})`;
+              })()}
             </div>
           </div>
         ),
